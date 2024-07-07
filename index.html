@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星野さくらとの対話</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            padding: 20px;
+        }
+        .card-header {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .card-content {
+            margin-bottom: 20px;
+        }
+        .card-footer {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 10px;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 0;
+        }
+        img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .progress {
+            height: 10px;
+            background-color: #4CAF50;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const GameComponent = () => {
+            const [affection, setAffection] = React.useState(50);
+            const [currentScene, setCurrentScene] = React.useState(0);
+            const [characterImage, setCharacterImage] = React.useState('https://via.placeholder.com/400x300');
+            const [gameOver, setGameOver] = React.useState(false);
+            const [gameCleared, setGameCleared] = React.useState(false);
+
+            const scenes = [
+                {
+                    text: "さくら「こんにちは！今日は学校の後、一緒に何かしない？」",
+                    choices: [
+                        { text: "一緒にカフェに行く", affectionChange: 15 },
+                        { text: "図書館で勉強する", affectionChange: 10 },
+                        { text: "家に帰る", affectionChange: -5 },
+                    ],
+                },
+                {
+                    text: "さくら「わぁ、楽しみ！あ、そういえば明日テストだったんだ...」",
+                    choices: [
+                        { text: "一緒に勉強しよう", affectionChange: 20 },
+                        { text: "大丈夫、さくらなら余裕だよ", affectionChange: 10 },
+                        { text: "え、知らなかったの？", affectionChange: -10 },
+                    ],
+                },
+                {
+                    text: "さくら「今日はありがとう！またね！」",
+                    choices: [
+                        { text: "また明日！", affectionChange: 10 },
+                        { text: "楽しかったよ", affectionChange: 15 },
+                        { text: "うん、バイバイ", affectionChange: 5 },
+                    ],
+                },
+                {
+                    text: "さくら「あら、偶然ね！週末なのに一人？私と遊びに行かない？」",
+                    choices: [
+                        { text: "喜んで！どこに行く？", affectionChange: 15 },
+                        { text: "君と二人きりか...ドキドキするな", affectionChange: 20 },
+                        { text: "ごめん、予定があるんだ", affectionChange: -10 },
+                    ],
+                },
+                {
+                    text: "さくら「プールに行きましょう！新しい水着、見てほしいな♪」",
+                    choices: [
+                        { text: "楽しみにしてるよ", affectionChange: 15 },
+                        { text: "水着姿が眩しそうだな", affectionChange: 20 },
+                        { text: "あまり露出の多い水着は...", affectionChange: -5 },
+                    ],
+                },
+                {
+                    text: "さくら「ねえ、私の部屋に来てくれてありがとう。ちょっとドキドキしちゃう...」",
+                    choices: [
+                        { text: "僕もドキドキしてる", affectionChange: 15 },
+                        { text: "落ち着いて、何もしないよ", affectionChange: 10 },
+                        { text: "二人きりで大丈夫？", affectionChange: 5 },
+                    ],
+                },
+                {
+                    text: "さくら「あのね...私、あなたのこと好きかも...どう思う？」",
+                    choices: [
+                        { text: "僕も好きだよ、さくら", affectionChange: 20 },
+                        { text: "突然すぎて驚いたけど、嬉しい", affectionChange: 15 },
+                        { text: "友達としてだよね？", affectionChange: -10 },
+                    ],
+                },
+                {
+                    text: "さくら「これからも一緒にいてくれる...？」",
+                    choices: [
+                        { text: "もちろん、ずっと一緒にいたい", affectionChange: 20 },
+                        { text: "ゆっくり関係を育んでいこう", affectionChange: 15 },
+                        { text: "まだ分からないけど、頑張ってみる", affectionChange: 10 },
+                    ],
+                },
+            ];
+
+            const handleChoice = (affectionChange) => {
+                const newAffection = Math.max(0, Math.min(150, affection + affectionChange));
+                setAffection(newAffection);
+                
+                if (currentScene === 2) {
+                    if (newAffection >= 85) {
+                        setCurrentScene(3);
+                    } else {
+                        setGameOver(true);
+                    }
+                } else if (currentScene === 5) {
+                    if (newAffection >= 110) {
+                        setCurrentScene(6);
+                    } else {
+                        setGameOver(true);
+                    }
+                } else if (currentScene === 7) {
+                    if (newAffection >= 130) {
+                        setGameCleared(true);
+                    } else {
+                        setGameOver(true);
+                    }
+                } else {
+                    setCurrentScene(currentScene + 1);
+                }
+            };
+
+            const handleImageUpload = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => setCharacterImage(e.target.result);
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const resetGame = () => {
+                setAffection(50);
+                setCurrentScene(0);
+                setGameOver(false);
+                setGameCleared(false);
+            };
+
+            return (
+                <div className="card" style={{ backgroundColor: currentScene <= 2 ? 'rgba(0, 128, 0, 0.2)' : currentScene <= 5 ? 'rgba(0, 0, 255, 0.2)' : 'rgba(255, 192, 203, 0.2)' }}>
+                    <div className="card-header">
+                        <h2>星野さくらとの対話</h2>
+                    </div>
+                    <div className="card-content">
+                        <img src={characterImage} alt="星野さくら" />
+                        <input type="file" onChange={handleImageUpload} accept="image/*" />
+                        <div className="progress-bar">
+                            <div className="progress" style={{ width: `${(affection / 150) * 100}%` }}></div>
+                        </div>
+                        <p style={{ textAlign: 'center' }}>好感度: {affection}/150</p>
+                        {gameOver ? (
+                            <>
+                                <p style={{ textAlign: 'center', color: 'red', fontWeight: 'bold' }}>バッドエンド</p>
+                                <button onClick={resetGame}>新しくゲームを始める</button>
+                            </>
+                        ) : gameCleared ? (
+                            <>
+                                <p style={{ textAlign: 'center', color: 'green', fontWeight: 'bold' }}>ゲームクリア！おめでとうございます！</p>
+                                <button onClick={resetGame}>新しくゲームを始める</button>
+                            </>
+                        ) : currentScene < scenes.length ? (
+                            <>
+                                <p>{scenes[currentScene].text}</p>
+                                {scenes[currentScene].choices.map((choice, index) => (
+                                    <button key={index} onClick={() => handleChoice(choice.affectionChange)}>
+                                        {choice.text}
+                                    </button>
+                                ))}
+                            </>
+                        ) : (
+                            <>
+                                <p style={{ textAlign: 'center' }}>全てのシーンが終了しました。</p>
+                                <button onClick={resetGame}>新しくゲームを始める</button>
+                            </>
+                        )}
+                    </div>
+                    <div className="card-footer">
+                        <button onClick={resetGame}>リセット</button>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<GameComponent />, document.getElementById('root'));
+    </script>
+</body>
+</html>
